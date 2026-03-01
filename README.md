@@ -30,7 +30,6 @@ Thunder Mail is not a replacement for resend or a similar service for a business
 - [Next.js](https://nextjs.org/) – framework
 - [TypeScript](https://www.typescriptlang.org/) – language
 - [Tailwind](https://tailwindcss.com/) – CSS
-- [Upstash](https://upstash.com/) – redis ratelimiting
 - [Neon](https://neon.tech/) – database
 - [Lucia Auth](https://lucia-auth.com/) – auth
 - [Vercel](https://vercel.com/) – deployments

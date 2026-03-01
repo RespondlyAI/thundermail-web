@@ -9,15 +9,10 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  // This header only works on vercel deployments
+
   const { id: emailId } = await params;
-  const headersList = await headers();
-  const auth = headersList.get("Authorization");
-          "ratelimit-reset": String(waitTime),
-          "retry-after": String(waitTime),
-        },
-      },
-    );
-  const { id: emailId } = await params;
+
   const headersList = await headers();
   const auth = headersList.get("Authorization");
   if (!auth) {
@@ -107,12 +102,7 @@ export async function GET(
   );
 
   return NextResponse.json(formattedEmail, {
-    status: 200,
-    headers: {
-      "ratelimit-limit": String(limit),
-      "ratelimit-remaining": String(remaining),
-      "ratelimit-reset": String(waitTime),
-    },
+    status: 200
   });
 }
 

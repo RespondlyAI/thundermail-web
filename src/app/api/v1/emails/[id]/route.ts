@@ -9,12 +9,10 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  // This header only works on vercel deployments
-
   const { id: emailId } = await params;
-
   const headersList = await headers();
   const auth = headersList.get("Authorization");
+  
   if (!auth) {
     return NextResponse.json(
       {
@@ -102,7 +100,7 @@ export async function GET(
   );
 
   return NextResponse.json(formattedEmail, {
-    status: 200
+    status: 200,
   });
 }
 

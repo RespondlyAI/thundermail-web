@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { EmailStatus, apiKeys, emails } from "@/db/schema";
 import { hash } from "@/lib/crypto-helpers";
+import { ratelimit } from "@/lib/upstash-ratelimit";
 import { and, eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
@@ -9,6 +10,31 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  // This header only works on vercel deployments
+  const ip = request.headers.get("x-forwarded-for") ?? "";
+  const { success, reset, limit, remaining } = await ratelimit.limit(ip);
+  const waitTime = Math.floor((reset - Date.now()) / 1000);
+
+  if (!success) {
+    return NextResponse.json(
+      {
+        statusCode: 429,
+        message:
+          "Too many requests. Please limit the number of requests per second.",
+        name: "rate_limit_exceeded",
+      },
+      {
+        status: 429,
+        headers: {
+          "ratelimit-limit": String(limit),
+          "ratelimit-remaining": String(remaining),
+          "ratelimit-reset": String(waitTime),
+          "retry-after": String(waitTime),
+        },
+      },
+    );
+  }
+
   const { id: emailId } = await params;
   const headersList = await headers();
   const auth = headersList.get("Authorization");
@@ -101,6 +127,11 @@ export async function GET(
 
   return NextResponse.json(formattedEmail, {
     status: 200,
+    headers: {
+      "ratelimit-limit": String(limit),
+      "ratelimit-remaining": String(remaining),
+      "ratelimit-reset": String(waitTime),
+    },
   });
 }
 

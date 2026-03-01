@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           statusCode: 422,
-          message: `Missing `${field}` field`,
+          message: `Missing \`${field}\` field`,
           name: "missing_required_field",
         },
         {
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           statusCode: 422,
-          message: `The `${field}` field must be a `string`.`,
+          message: `The \`${field}\` field must be a \`string\`.`,
           name: "validation_error",
         },
         {
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
           return NextResponse.json(
             {
               statusCode: 422,
-              message: `Invalid `${field}` field. The email address needs to follow the `email@example.com` or `Name <email@example.com>` format.`,
+              message: `Invalid \`${field}\` field. The email address needs to follow the \`email@example.com\` or \`Name <email@example.com>\` format.`,
               name: "validation_error",
             },
             {
@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json(
               {
                 statusCode: 422,
-                message: `Invalid `${field}` field. The email address needs to follow the `email@example.com` or `Name <email@example.com>` format.`,
+                message: `Invalid \`${field}\` field. The email address needs to follow the \`email@example.com\` or \`Name <email@example.com>\` format.`,
                 name: "validation_error",
               },
               {
@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           {
             statusCode: 422,
-            message: `The `${field}` field must be a `string` or a `string[]`.`,
+            message: `The \`${field}\` field must be a \`string\` or a \`string[]\`.`,
             name: "validation_error",
           },
           {
@@ -192,7 +192,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         statusCode: 403,
-        message: `The `${fromAddress}` gmail account is not linked to your account. Please link the account before sending emails.`,
+        message: `The \`${fromAddress}\` gmail account is not linked to your account. Please link the account before sending emails.`,
         name: "invalid_from_address",
       },
       {

@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ statusCode: 403, message: "API key is invalid", name: "invalid_api_Key" }, { status: 403 });
   }
 
-  let reqBody;
+  let reqBody: any;
   try {
     reqBody = await request.json();
   } catch (error) {

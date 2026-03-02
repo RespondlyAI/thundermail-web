@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ statusCode: 429, message: "You have reached your daily email sending quota.", name: "daily_quota_exceeded" }, { status: 429 });
   }
 
-  let reqBody;
+  let reqBody: any;
   try {
     reqBody = await request.json();
   } catch (error) {

@@ -35,6 +35,20 @@ export async function GET(request: NextRequest) {
     const tokens = await google.validateAuthorizationCode(code, codeVerifier);
     const googleUser = parseJWT(tokens.idToken)!.payload as GoogleUser;
 
+    const allowedEmails =
+      process.env.ALLOWED_EMAILS?.split(",").map((e) =>
+        e.trim().toLowerCase(),
+      ) || [];
+
+    if (!allowedEmails.includes(googleUser.email.toLowerCase())) {
+      return new Response(null, {
+        status: 302,
+        headers: {
+          Location: "/signin?error=unauthorized",
+        },
+      });
+    }
+
     const existingUser = await db.query.users.findFirst({
       where: eq(users.googleId, googleUser.sub),
     });

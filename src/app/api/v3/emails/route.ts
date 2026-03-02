@@ -12,7 +12,7 @@ import { extractEmailAddress, validateEmail } from "@/lib/utils";
 import { randomUUID } from "crypto";
 import { and, eq } from "drizzle-orm";
 import { headers } from "next/headers";
-import { NextRequest, NextResponse, unstable_after as after } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 
 export async function POST(request: NextRequest) {
   const headersList = await headers();

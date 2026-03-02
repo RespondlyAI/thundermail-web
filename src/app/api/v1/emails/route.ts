@@ -14,7 +14,7 @@ import { SendMessageCommand } from "@aws-sdk/client-sqs";
 import { randomUUID } from "crypto";
 import { and, eq } from "drizzle-orm";
 import { headers } from "next/headers";
-import { NextRequest, NextResponse, unstable_after as after } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 
 export async function POST(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for") ?? "";

@@ -2,11 +2,13 @@ import { db } from "@/db";
 import {
   EmailRecipient,
   apiKeys,
+  emailEvents,
   emailRecipients,
   emails,
   gmailAccounts,
 } from "@/db/schema";
 import { hash } from "@/lib/crypto-helpers";
+import { isValidEventType, isValidEventSource } from "@/lib/email-enums";
 import { sqsClient } from "@/lib/sqs-client";
 import { extractEmailAddress, validateEmail } from "@/lib/utils";
 import { SendMessageCommand } from "@aws-sdk/client-sqs";
@@ -71,6 +73,31 @@ export async function POST(request: NextRequest) {
         textContent: reqBody.text ?? null,
         htmlContent: reqBody.html ?? null,
       });
+
+      // Store business metadata in email_events table if provided
+      if (reqBody.event_type || reqBody.event_source) {
+        const eventType = reqBody.event_type || "unknown";
+        const eventSource = reqBody.event_source || "api-v2";
+        
+        // Validate event types and sources if provided
+        if (reqBody.event_type && !isValidEventType(reqBody.event_type)) {
+          console.warn(`Invalid event_type: ${reqBody.event_type}`);
+        }
+        if (reqBody.event_source && !isValidEventSource(reqBody.event_source)) {
+          console.warn(`Invalid event_source: ${reqBody.event_source}`);
+        }
+
+        await db.insert(emailEvents).values({
+          id: randomUUID(),
+          emailId,
+          eventType,
+          eventSource,
+          organizationId: reqBody.organization_id || null,
+          businessUserId: reqBody.business_user_id || null,
+          correlationId: reqBody.correlation_id || null,
+          metadata: reqBody.metadata || null,
+        });
+      }
 
       const recipients: EmailRecipient[] = [];
       for (const type of ["to", "cc", "bcc"] as const) {

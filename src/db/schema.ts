@@ -1,6 +1,7 @@
 import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm";
 import {
   index,
+  json,
   pgEnum,
   pgTable,
   text,
@@ -152,6 +153,7 @@ export const emailRelations = relations(emails, ({ one, many }) => ({
     references: [users.id],
   }),
   recipients: many(emailRecipients),
+  events: many(emailEvents),
 }));
 
 export const emailStatus = pgEnum("email_status", [
@@ -194,3 +196,47 @@ export const emailRecipientRelations = relations(
 
 export type EmailStatus = InferSelectModel<typeof emailRecipients>["status"];
 export type EmailRecipient = InferInsertModel<typeof emailRecipients>;
+
+// Email Events table for business context
+export const emailEvents = pgTable(
+  "email_events",
+  {
+    id: varchar("id").primaryKey(),
+    emailId: varchar("email_id")
+      .notNull()
+      .references(() => emails.id, { onDelete: "cascade" }),
+    eventType: varchar("event_type").notNull(), // Flexible for programmatic updates
+    eventSource: varchar("event_source").notNull(), // Flexible for programmatic updates
+    organizationId: varchar("organization_id"),
+    businessUserId: varchar("business_user_id"),
+    correlationId: varchar("correlation_id"),
+    metadata: json("metadata"), // Native JSON support for React Email templates
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+      mode: "date",
+    })
+      .notNull()
+      .defaultNow(),
+  },
+  (emailEvents) => {
+    return {
+      emailIdIndex: index("email_event_email_idx").on(emailEvents.emailId),
+      eventTypeIndex: index("email_event_type_idx").on(emailEvents.eventType),
+      eventSourceIndex: index("email_event_source_idx").on(emailEvents.eventSource),
+      organizationIdIndex: index("email_event_org_idx").on(emailEvents.organizationId),
+      businessUserIdIndex: index("email_event_business_user_idx").on(emailEvents.businessUserId),
+      correlationIdIndex: index("email_event_correlation_idx").on(emailEvents.correlationId),
+      createdAtIndex: index("email_event_created_at_idx").on(emailEvents.createdAt),
+    };
+  },
+);
+
+export const emailEventRelations = relations(emailEvents, ({ one }) => ({
+  email: one(emails, {
+    fields: [emailEvents.emailId],
+    references: [emails.id],
+  }),
+}));
+
+export type EmailEvent = InferSelectModel<typeof emailEvents>;
+export type EmailEventInsert = InferInsertModel<typeof emailEvents>;

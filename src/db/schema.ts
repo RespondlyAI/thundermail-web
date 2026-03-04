@@ -1,6 +1,7 @@
 import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm";
 import {
   index,
+  json,
   pgEnum,
   pgTable,
   text,
@@ -204,12 +205,12 @@ export const emailEvents = pgTable(
     emailId: varchar("email_id")
       .notNull()
       .references(() => emails.id, { onDelete: "cascade" }),
-    eventType: varchar("event_type").notNull(),
-    eventSource: varchar("event_source").notNull(),
+    eventType: varchar("event_type").notNull(), // Flexible for programmatic updates
+    eventSource: varchar("event_source").notNull(), // Flexible for programmatic updates
     organizationId: varchar("organization_id"),
     businessUserId: varchar("business_user_id"),
     correlationId: varchar("correlation_id"),
-    metadata: text("metadata"), // JSON metadata
+    metadata: json("metadata"), // Native JSON support for React Email templates
     createdAt: timestamp("created_at", {
       withTimezone: true,
       mode: "date",
